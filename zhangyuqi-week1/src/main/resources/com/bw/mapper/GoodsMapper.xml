@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bw.mapper.GoodsMapperDao">
+	<select id="getList" resultType="map" parameterType="map">
+		SELECT s.*,GROUP_CONCAT(g.gname) gname FROM shop s,goods g,zhong z 
+		WHERE z.sid=s.sid and g.gid=z.gid 
+		<if test="gname != null and gname != ''">
+			and g.gname like CONCAT("%",#{gname},"%")
+		</if>
+		<if test="sname != null and sname != ''">
+			and s.sname like CONCAT("%",#{sname},"%")
+		</if>
+		GROUP BY z.sid
+	</select>
+	
+	<select id="selGoodsList" resultType="goods">
+		select * from goods
+	</select>
+	
+	<insert id="addShop" parameterType="map">
+		insert into shop (sname,sdate) values (#{sname},#{sdate});
+	</insert>
+	
+	<select id="getShop" parameterType="string" resultType="shop">
+		select DISTINCT* from shop where sname=#{_parameter}
+	</select>
+	
+	<insert id="addZhong" parameterType="map">
+		insert into zhong (sid,gid) values (#{sid},#{gid})
+	</insert>
+	
+	<select id="getOne" parameterType="int" resultType="map">
+		SELECT s.*,GROUP_CONCAT(g.gname) gname FROM shop s,goods g,zhong z 
+		WHERE z.sid=s.sid and g.gid=z.gid and s.sid=#{0}
+		GROUP BY z.sid
+	</select>
+	
+	<delete id="delAll" parameterType="string">
+		delete from zhong where sid in (${_parameter})
+	</delete>
+</mapper>
